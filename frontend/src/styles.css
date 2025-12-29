@@ -1,0 +1,170 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Glass morphism effect */
+.glass {
+  backdrop-filter: blur(14px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* Yellow theme overrides */
+@layer base {
+  :root {
+    --color-primary: #fbbf24; /* Yellow-400 */
+    --color-secondary: #0b1220; /* Dark background */
+    --color-text: #fbbf24; /* Yellow text */
+  }
+  
+  body {
+    @apply bg-slate-950 text-white;
+  }
+}
+
+/* Button styles - Yellow by default */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 rounded-2xl bg-yellow-400 text-black font-semibold hover:bg-yellow-500 transition-colors;
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 rounded-2xl bg-white/10 text-white font-semibold hover:bg-white/20 transition-colors;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 rounded-2xl bg-white/5 border border-white/10 text-white outline-none focus:border-yellow-400 transition-colors;
+  }
+  
+  .text-accent {
+    @apply text-yellow-400;
+  }
+  
+  .bg-accent {
+    @apply bg-yellow-400;
+  }
+  
+  .border-accent {
+    @apply border-yellow-400;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0b1220;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #fbbf24;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #f59e0b;
+}
+
+/* Newsletter Editor Styles (ReactQuill Dark Theme) */
+.newsletter-editor .ql-container {
+  background: #0f172a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0 0 12px 12px;
+  min-height: 300px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.newsletter-editor .ql-editor {
+  color: white;
+  min-height: 300px;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.newsletter-editor .ql-editor.ql-blank::before {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: normal;
+}
+
+.newsletter-editor .ql-toolbar {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px 12px 0 0;
+  border-bottom: none;
+}
+
+.newsletter-editor .ql-stroke {
+  stroke: rgba(255, 255, 255, 0.7);
+}
+
+.newsletter-editor .ql-fill {
+  fill: rgba(255, 255, 255, 0.7);
+}
+
+.newsletter-editor .ql-picker-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.newsletter-editor .ql-picker-options {
+  background: #1e293b;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.newsletter-editor .ql-picker-item {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.newsletter-editor .ql-picker-item:hover {
+  color: white;
+  background: rgba(251, 191, 36, 0.1);
+}
+
+.newsletter-editor .ql-active {
+  color: #fbbf24 !important;
+}
+
+.newsletter-editor .ql-active .ql-stroke {
+  stroke: #fbbf24 !important;
+}
+
+.newsletter-editor .ql-active .ql-fill {
+  fill: #fbbf24 !important;
+}
+
+.newsletter-editor button:hover .ql-stroke {
+  stroke: #fbbf24;
+}
+
+.newsletter-editor button:hover .ql-fill {
+  fill: #fbbf24;
+}
+
+.newsletter-editor .ql-editor a {
+  color: #fbbf24;
+  text-decoration: underline;
+}
+
+.newsletter-editor .ql-editor h1,
+.newsletter-editor .ql-editor h2,
+.newsletter-editor .ql-editor h3 {
+  color: white;
+  font-weight: 600;
+  margin-top: 1em;
+  margin-bottom: 0.5em;
+}
+
+.newsletter-editor .ql-editor ul,
+.newsletter-editor .ql-editor ol {
+  padding-left: 1.5em;
+}
+
+.newsletter-editor .ql-editor li {
+  margin-bottom: 0.5em;
+}

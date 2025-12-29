@@ -1,0 +1,57 @@
+services:
+  db:
+    image: postgres:16
+    container_name: neeste_db
+    environment:
+      POSTGRES_DB: neeste
+      POSTGRES_USER: neeste
+      POSTGRES_PASSWORD: neeste123
+    ports:
+      - "5432:5432"
+    volumes:
+      - neeste_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U neeste"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    container_name: neeste_backend
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"
+    environment:
+      DJANGO_SECRET_KEY: "change-me"
+      DJANGO_DEBUG: "1"
+      DB_NAME: neeste
+      DB_USER: neeste
+      DB_PASSWORD: neeste123
+      DB_HOST: db
+      DB_PORT: "5432"
+      ALLOWED_HOSTS: "localhost,127.0.0.1"
+      CORS_ORIGINS: "http://localhost:5173"
+
+      MOMO_BASE_URL: "https://sandbox.momodeveloper.mtn.com"
+      MOMO_TARGET_ENV: "sandbox"
+      MOMO_COLLECTION_SUB_KEY: "YOUR_COLLECTION_SUBSCRIPTION_KEY"
+      MOMO_API_USER: "YOUR_API_USER_UUID"
+      MOMO_API_KEY: "8cc87f6523924017bf93b48c3804e68e"
+      MOMO_CALLBACK_URL: "http://localhost:8000/api/public/momo/callback/"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  frontend:
+    build: ./frontend
+    container_name: neeste_frontend
+    environment:
+      VITE_API_URL: "http://localhost:8000/api"
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  neeste_pg:
