@@ -5,7 +5,7 @@ services:
     image: postgres:16
     container_name: neeste_db
     env_file:
-      - .env  # Will load POSTGRES_* vars
+      - .env
     ports:
       - "5432:5432"
     volumes:
@@ -24,7 +24,6 @@ services:
     env_file:
       - .env
     environment:
-      # Overrides or defaults if needed
       ALLOWED_HOSTS: "*"
       CORS_ORIGINS: "http://localhost:5173"
     ports:
@@ -40,7 +39,7 @@ services:
     environment:
       VITE_API_URL: "http://localhost:8000/api"
     ports:
-      - "5173:80"  # Or keep 5173:5173 if using Vite dev server in prod (not recommended)
+      - "5173:5173"
     depends_on:
       - backend
 

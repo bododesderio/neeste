@@ -3,6 +3,7 @@ from rest_framework.decorators import api_view, permission_classes, parser_class
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.throttling import AnonRateThrottle
 from django.shortcuts import get_object_or_404
 from django.http import FileResponse, Http404
 from django.db.models import Sum, Count, Q, Avg, F
@@ -456,4 +457,22 @@ def momo_status(request, reference_id):
 @api_view(["POST"])
 @permission_classes([AllowAny])
 def momo_callback(request):
-    return Response({"ok": True})
+    # Proper handling
+    ref = request.data.get("referenceId") or request.headers.get("X-Reference-Id")
+    if ref:
+        try:
+            order = Order.objects.get(momo_reference_id=ref)
+            data = get_request_status(ref)
+            st = data.get("status", "").upper()
+            order.momo_status = st
+            if data.get("financialTransactionId"):
+                order.momo_financial_transaction_id = data.get("financialTransactionId", "")
+            if st == "SUCCESSFUL" and order.status != Order.PAID:
+                order.status = Order.PAID
+                order.save()
+                ensure_digital_tokens_for_paid_order(order)
+                if hasattr(Notification, 'PAYMENT_RECEIVED'):
+                    Notification.objects.create(type=Notification.PAYMENT_RECEIVED, title=f"Payment - Order #{order.reference}", message=f"{order.total_amount:,.0f} UGX from {order.full_name}", link="/admin/orders")
+        except Order.DoesNotExist:
+            pass
+    return Response({"status": "OK"}, status=200)

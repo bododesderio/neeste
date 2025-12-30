@@ -11,7 +11,6 @@ from .models import (
     EmailCampaign,
 )
 
-
 class SiteSettingsSerializer(serializers.ModelSerializer):
     logo_url = serializers.SerializerMethodField()
     favicon_url = serializers.SerializerMethodField()
@@ -58,6 +57,22 @@ class SiteSettingsSerializer(serializers.ModelSerializer):
             "theme",
             "updated_at",
         ]
+    
+    def get_fields(self):
+        fields = super().get_fields()
+        request = self.context.get('request')
+        if request and not request.user.is_superuser:
+            # Hide sensitive email fields from non-superusers
+            sensitive = [
+                'email_host_user',
+                'email_host_password',
+                'email_host',
+                'email_port',
+                'email_use_tls'
+            ]
+            for field in sensitive:
+                fields.pop(field, None)
+        return fields
     
     def get_logo_url(self, obj):
         if obj.logo:

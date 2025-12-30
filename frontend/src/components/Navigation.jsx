@@ -1,8 +1,9 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function Navigation({ settings }) {
   const location = useLocation();
+  const [cartCount, setCartCount] = useState(0);
   
   const isActive = (path) => location.pathname === path;
   
@@ -19,6 +20,12 @@ export default function Navigation({ settings }) {
     }
   }, [settings?.favicon_url]);
   
+  // Get cart count
+  useEffect(() => {
+    const savedCart = JSON.parse(localStorage.getItem("cart") || "[]");
+    setCartCount(savedCart.reduce((sum, item) => sum + item.qty, 0));
+  }, []);
+
   const primaryColor = settings?.primary_color || "#f59e0b";
   
   const navLinkClass = (path) => `
@@ -56,7 +63,17 @@ export default function Navigation({ settings }) {
           Contact
         </Link>
         
-        {/* Sign In Button - Uses dynamic primary color */}
+        {/* Cart Link */}
+        <Link to="/checkout" className="relative ml-4 px-4 py-2 rounded-xl text-white/70 hover:text-white hover:bg-white/10 transition-all">
+          Cart
+          {cartCount > 0 && (
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+              {cartCount}
+            </span>
+          )}
+        </Link>
+        
+        {/* Sign In Button */}
         <Link 
           to="/admin/login" 
           style={{ 

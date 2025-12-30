@@ -15,6 +15,7 @@ import AdminNewsletter from "./pages/AdminNewsletter";
 import AdminContacts from "./pages/AdminContacts";
 import AdminReports from "./pages/AdminReports";
 import NotificationDetail from "./pages/NotificationDetail";
+import PaymentSuccess from "./pages/PaymentSuccess.jsx";
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
           <Route path="contacts" element={<AdminContacts />} />
           <Route path="reports" element={<AdminReports />} />
           <Route path="notification/:id" element={<NotificationDetail />} />
+          <Route path="/payment/success" element={<PaymentSuccess />} />
         </Route>
       </Routes>
     </BrowserRouter>
