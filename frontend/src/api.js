@@ -2,10 +2,14 @@ import axios from "axios";
 
 export const API_URL = import.meta.env.VITE_API_URL?.replace(/\/+$/, "") || "http://localhost:8000/api";
 
-export const api = axios.create({
-  baseURL: API_URL
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  timeout: 10000,
 });
-
 
 // Automatically attach token to all requests
 api.interceptors.request.use(
@@ -68,3 +72,6 @@ export function setAuth(token) {
     delete api.defaults.headers.common["Authorization"];
   }
 }
+
+// Export as default
+export default api;

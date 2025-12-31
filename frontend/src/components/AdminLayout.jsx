@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Outlet, NavLink, Link, useNavigate, useLocation } from "react-router-dom";
 import ProfileDropdown from "./ProfileDropdown.jsx";
-import { api } from "../api.js";
+import api from "../api.js";  // ✅ FIXED: Removed curly braces
 
 export default function AdminLayout() {
   const navigate = useNavigate();
@@ -126,8 +126,10 @@ export default function AdminLayout() {
       <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col">
         {/* Logo Section */}
         <div className="p-6 border-b border-slate-800">
-          <h1 className="text-2xl font-bold text-white">Neesté</h1>
-          <p className="text-xs text-slate-400 mt-1">Admin Panel</p>
+          <Link to="/" className="block">
+            <h1 className="text-2xl font-bold text-white">Neesté</h1>
+            <p className="text-xs text-slate-400 mt-1">Admin Panel</p>
+          </Link>
         </div>
 
         {/* Navigation */}
@@ -189,6 +191,19 @@ export default function AdminLayout() {
             Contacts
           </NavLink>
         </nav>
+
+        {/* Back to Website Link */}
+        <div className="p-4 border-t border-slate-800">
+          <Link 
+            to="/"
+            className="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:text-white hover:bg-slate-700 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Website
+          </Link>
+        </div>
       </aside>
 
       {/* Main Content Area */}
@@ -219,85 +234,85 @@ export default function AdminLayout() {
 
               {/* Notifications Dropdown */}
               {showNotifications && (
-                <div className="absolute right-0 mt-2 w-96 bg-slate-800 rounded-2xl shadow-xl border border-slate-700 z-50 max-h-[500px] flex flex-col">
-                  {/* Header */}
-                  <div className="p-4 border-b border-slate-700 flex items-center justify-between">
-                    <h3 className="font-semibold text-white">Notifications</h3>
-                    {unreadCount > 0 && (
-                      <button
-                        onClick={markAllAsRead}
-                        className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
-                      >
-                        Mark all as read
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Notifications List */}
-                  <div className="flex-1 overflow-y-auto">
-                    {notifications.length === 0 ? (
-                      <div className="p-8 text-center">
-                        <svg className="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                        <p className="text-sm text-slate-400">No notifications yet</p>
-                      </div>
-                    ) : (
-                      <div className="divide-y divide-slate-700">
-                        {notifications.slice(0, 5).map((notif) => (
-                          <Link
-                            key={notif.id}
-                            to={`/admin/notification/${notif.id}`}
-                            onClick={() => {
-                              if (!notif.read) markAsRead(notif.id);
-                              setShowNotifications(false);
-                            }}
-                            className={`block p-4 hover:bg-slate-700/50 transition-colors ${
-                              !notif.read ? "bg-slate-700/30" : ""
-                            }`}
-                          >
-                            <div className="flex gap-3">
-                              {getNotificationIcon(notif.type)}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-start justify-between gap-2">
-                                  <p className="text-sm font-semibold text-white truncate">{notif.title}</p>
-                                  {!notif.read && (
-                                    <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 mt-1"></span>
-                                  )}
-                                </div>
-                                <p className="text-xs text-slate-400 mt-1 line-clamp-2">{notif.message}</p>
-                                <p className="text-xs text-slate-500 mt-2">{formatTimeAgo(notif.created_at)}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Footer */}
-                  {notifications.length > 5 && (
-                    <div className="p-3 border-t border-slate-700">
-                      <button
-                        onClick={() => {
-                          navigate("/admin/dashboard");
-                          setShowNotifications(false);
-                        }}
-                        className="w-full text-sm text-yellow-400 hover:text-yellow-300 transition-colors text-center"
-                      >
-                        View all notifications
-                      </button>
+                <>
+                  <div className="absolute right-0 mt-2 w-96 bg-slate-800 rounded-2xl shadow-xl border border-slate-700 z-50 max-h-[500px] flex flex-col">
+                    {/* Header */}
+                    <div className="p-4 border-b border-slate-700 flex items-center justify-between">
+                      <h3 className="font-semibold text-white">Notifications</h3>
+                      {unreadCount > 0 && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-xs text-yellow-400 hover:text-yellow-300 transition-colors"
+                        >
+                          Mark all as read
+                        </button>
+                      )}
                     </div>
-                  )}
-                </div>
-              )}
 
-              {/* Click outside to close */}
-              {showNotifications && (
-                <div
-                  className="fixed inset-0 z-40"
-                  onClick={() => setShowNotifications(false)}
-                />
+                    {/* Notifications List */}
+                    <div className="flex-1 overflow-y-auto">
+                      {notifications.length === 0 ? (
+                        <div className="p-8 text-center">
+                          <svg className="w-12 h-12 text-slate-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                          </svg>
+                          <p className="text-sm text-slate-400">No notifications yet</p>
+                        </div>
+                      ) : (
+                        <div className="divide-y divide-slate-700">
+                          {notifications.slice(0, 5).map((notif) => (
+                            <Link
+                              key={notif.id}
+                              to={`/admin/notification/${notif.id}`}
+                              onClick={() => {
+                                if (!notif.read) markAsRead(notif.id);
+                                setShowNotifications(false);
+                              }}
+                              className={`block p-4 hover:bg-slate-700/50 transition-colors ${
+                                !notif.read ? "bg-slate-700/30" : ""
+                              }`}
+                            >
+                              <div className="flex gap-3">
+                                {getNotificationIcon(notif.type)}
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-start justify-between gap-2">
+                                    <p className="text-sm font-semibold text-white truncate">{notif.title}</p>
+                                    {!notif.read && (
+                                      <span className="w-2 h-2 bg-yellow-400 rounded-full flex-shrink-0 mt-1"></span>
+                                    )}
+                                  </div>
+                                  <p className="text-xs text-slate-400 mt-1 line-clamp-2">{notif.message}</p>
+                                  <p className="text-xs text-slate-500 mt-2">{formatTimeAgo(notif.created_at)}</p>
+                                </div>
+                              </div>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Footer */}
+                    {notifications.length > 5 && (
+                      <div className="p-3 border-t border-slate-700">
+                        <button
+                          onClick={() => {
+                            navigate("/admin/dashboard");
+                            setShowNotifications(false);
+                          }}
+                          className="w-full text-sm text-yellow-400 hover:text-yellow-300 transition-colors text-center"
+                        >
+                          View all notifications
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Click outside to close */}
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowNotifications(false)}
+                  />
+                </>
               )}
             </div>
 
