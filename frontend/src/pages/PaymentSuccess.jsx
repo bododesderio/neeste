@@ -19,7 +19,6 @@ export default function PaymentSuccess() {
   const orderRef = searchParams.get("order");
 
   useEffect(() => {
-    // Load settings
     api.get("/public/bootstrap/").then(res => setSettings(res.data.settings));
 
     if (!referenceId) {
@@ -27,9 +26,8 @@ export default function PaymentSuccess() {
       return;
     }
 
-    // Poll payment status
     let tries = 0;
-    const maxTries = 60; // 3 minutes max
+    const maxTries = 60;
 
     pollTimerRef.current = setInterval(async () => {
       tries += 1;
@@ -43,15 +41,16 @@ export default function PaymentSuccess() {
         setStatus(momoStatus || "PENDING");
 
         if (orderStatus === "PAID") {
-          // Payment successful!
           clearInterval(pollTimerRef.current);
-          setMessage("Payment successful! ✅");
+          setMessage("Payment successful! 🎉");
           setDownloadLinks(links);
           setStatus("SUCCESSFUL");
 
-          // Start 5 second countdown
-          setCountdown(5);
-          let count = 5;
+          // Clear cart on success
+          localStorage.removeItem("cart");
+
+          setCountdown(10);
+          let count = 10;
           redirectTimerRef.current = setInterval(() => {
             count -= 1;
             setCountdown(count);
@@ -60,7 +59,6 @@ export default function PaymentSuccess() {
               navigate("/");
             }
           }, 1000);
-
           return;
         }
 
@@ -71,30 +69,28 @@ export default function PaymentSuccess() {
           return;
         }
 
-        setMessage(`Waiting for payment... (${momoStatus || "Processing"})`);
+        setMessage(`Confirm payment on your phone... (${tries}/${maxTries})`);
 
         if (tries >= maxTries) {
           clearInterval(pollTimerRef.current);
-          setMessage("Payment is taking longer than expected. Check your order status later.");
+          setMessage("Taking longer than expected. Check later in your orders.");
         }
       } catch (err) {
         console.error("Status poll error:", err);
         if (tries >= maxTries) {
           clearInterval(pollTimerRef.current);
-          setMessage("Could not confirm payment status. Please check your order.");
+          setMessage("Could not confirm payment. Contact support if needed.");
         }
       }
     }, 3000);
 
     return () => {
-      if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-      if (redirectTimerRef.current) clearInterval(redirectTimerRef.current);
+      clearInterval(pollTimerRef.current);
+      clearInterval(redirectTimerRef.current);
     };
   }, [referenceId, navigate]);
 
-  // Apply theme colors globally
   useTheme(settings);
-
   const bgColor = settings?.secondary_color || "#0b1220";
 
   return (
@@ -104,7 +100,6 @@ export default function PaymentSuccess() {
 
         <div className="mt-20 flex items-center justify-center">
           <div className="max-w-2xl w-full glass rounded-3xl p-12 text-center">
-            {/* Status Icon */}
             <div className="mb-8">
               {status === "SUCCESSFUL" ? (
                 <div className="w-24 h-24 mx-auto rounded-full bg-green-500/20 flex items-center justify-center">
@@ -127,7 +122,6 @@ export default function PaymentSuccess() {
               )}
             </div>
 
-            {/* Order Reference */}
             {orderRef && (
               <div className="mb-6">
                 <p className="text-sm text-white/60">Order Reference</p>
@@ -135,7 +129,6 @@ export default function PaymentSuccess() {
               </div>
             )}
 
-            {/* Status Message */}
             <h1 className="text-3xl font-bold mb-4">
               {status === "SUCCESSFUL" ? "Payment Successful!" : 
                status === "FAILED" ? "Payment Failed" : 
@@ -143,7 +136,6 @@ export default function PaymentSuccess() {
             </h1>
             <p className="text-lg text-white/80 mb-8">{message}</p>
 
-            {/* Download Links */}
             {downloadLinks.length > 0 && (
               <div className="mb-8 p-6 rounded-2xl bg-blue-500/10 border border-blue-500/30">
                 <h3 className="font-semibold mb-4">Your Downloads</h3>
@@ -154,21 +146,18 @@ export default function PaymentSuccess() {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+                      className="block p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-colors flex items-center justify-between"
                     >
-                      <div className="flex items-center justify-between">
-                        <span className="font-semibold">{link.product}</span>
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                        </svg>
-                      </div>
+                      <span className="font-semibold">{link.product}</span>
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                      </svg>
                     </a>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Payment Instructions */}
             {status === "PENDING" && (
               <div className="p-6 rounded-2xl bg-yellow-400/10 border border-yellow-400/30 mb-8">
                 <p className="text-sm text-yellow-200">
@@ -177,32 +166,21 @@ export default function PaymentSuccess() {
               </div>
             )}
 
-            {/* Countdown */}
             {countdown !== null && (
               <div className="mb-6">
                 <p className="text-white/70">
-                  Redirecting to home in <span className="font-bold text-yellow-400">{countdown}</span> seconds...
+                  Redirecting home in <span className="font-bold text-yellow-400">{countdown}</span> seconds...
                 </p>
               </div>
             )}
 
-            {/* Action Buttons */}
             <div className="flex gap-4 justify-center">
-              {status === "SUCCESSFUL" || status === "FAILED" ? (
-                <button
-                  onClick={() => navigate("/")}
-                  className="px-8 py-3 rounded-2xl bg-yellow-400 text-black font-semibold hover:bg-yellow-500 transition-colors"
-                >
-                  Back to Home
-                </button>
-              ) : (
-                <button
-                  onClick={() => navigate("/")}
-                  className="px-8 py-3 rounded-2xl bg-white/10 text-white font-semibold hover:bg-white/20 transition-colors"
-                >
-                  Cancel
-                </button>
-              )}
+              <button
+                onClick={() => navigate("/")}
+                className="px-8 py-3 rounded-2xl bg-yellow-400 text-black font-semibold hover:bg-yellow-500 transition-colors"
+              >
+                {status === "SUCCESSFUL" ? "Back to Home" : "Cancel"}
+              </button>
             </div>
           </div>
         </div>

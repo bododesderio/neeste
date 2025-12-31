@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   db:
     image: postgres:16
@@ -37,7 +35,7 @@ services:
     build: ./frontend
     container_name: neeste_frontend
     environment:
-      VITE_API_URL: "http://localhost:8000/api"
+      VITE_API_URL: "http://backend:8000/api"   # ← CHANGED: use service name
     ports:
       - "5173:5173"
     depends_on:
